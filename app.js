@@ -1,13 +1,14 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const dotenv = require('dotenv').config;
+const port = process.env.PORT || 3000;
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
-var app = express();
+
+const app = express();
 
 const mongoose = require('mongoose');
 
@@ -21,8 +22,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Routes
+app.use('/api', require('./routes/index'));
+app.use('/user', require('./routes/userRoute'));
+app.use('/role', require('./routes/roleRoute'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -57,8 +60,6 @@ mongoose.connect(uri, {
 
 
 // Start the server on port 3000
-app.listen(3000, () => {
-  console.log('Server started on port 3000');
-});
+app.listen(port, () => console.log('Server started on port ', port));
 
 module.exports = app;
