@@ -27,6 +27,11 @@ function paginate(items, limit = 10, currentPage = 1) {
     };
 }
 
+// Delete file
+
+
+
+
 
 
 

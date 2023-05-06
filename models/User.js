@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const RoleModel = require('./Role');
 
 const UserSchema = new mongoose.Schema({
     avatar: {
         type: String,
         required: false,
+        default: '/media/avatar.png'
     },
 
     firstName: {
@@ -44,7 +44,8 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: false,
         ref: 'Role',
-        default: null
+        default: null,
+        
     },
 
 },{

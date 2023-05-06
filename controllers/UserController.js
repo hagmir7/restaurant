@@ -1,14 +1,21 @@
-const express = require('express');
 const { paginate } = require('../utils')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
+
+// Use .env
+require('dotenv').config({ path: './.env' });
+
+// Project director path
+const __app = path.resolve(path.join(__dirname, '..'));
+
 
 
 
 // @desc     List of users
-// @route    Post /user/register
+// @route    Post /user/list
 // @access   Privet (Admin)
 exports.list = async (req, res) => {
     try{
@@ -40,8 +47,8 @@ exports.login = async (req, res, next) =>{
     if (!userPassword) {
       return res.json({ message: 'Password is incorrect!', type: "danger" })
     }
-
-    const token = jwt.sign({ userId: user._id }, "Agmir");
+    // Generate token
+    const token = jwt.sign({id: user._id}, process.env.TOKEN_SECRET,{ expiresIn: '20d'});
     return res.json({ token, userId: user._id });
   } catch (error) {
     console.log("Error to login: ", error);
@@ -52,12 +59,12 @@ exports.login = async (req, res, next) =>{
 // @desc     Create new user and authentication
 // @route    Post /user/register
 // @access   Public 
-exports.register = async (req, res, nex) =>{
-  const { first_name, last_name, email, password } = req.body;
+exports.register = async (req, res, next) =>{
+  const { firstName, lastName, email, password } = req.body;
   // check if all fields is filled
-  if(!first_name || !last_name || !email || !password){
+  if(!firstName || !lastName || !email || !password){
     res.status(400);
-    throw Error('Please add all fields');
+    throw new Error('Please add all fields');
   }
 
   // Check if user is already exists
@@ -68,20 +75,17 @@ exports.register = async (req, res, nex) =>{
 
   try {
     // Create a new user from the request body
-    const user = new User({
-      firstName: first_name,
-      lastName: last_name,
+    const user = await User.create({
+      firstName,
+      lastName,
       email: email,
-      // hash password
       password: bcrypt.hashSync(password, 10),
     });
 
-    // Save the new user to MongoDB instance
-    const newUser = await user.save();
     // Generate token
-    const token = jwt.sign({ userId: newUser._id }, "Agmir");
+    const token = jwt.sign({id: user._id}, process.env.TOKEN_SECRET,{ expiresIn: '20d'});
     // Return token
-    res.json({ token, userId: newUser._id });
+    res.status(201).json({ token, userId: user._id });
   } catch (err) {
     console.error('Error creating new user:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -91,10 +95,134 @@ exports.register = async (req, res, nex) =>{
 
 // @desc     Get current auth user
 // @route    Post /user/auth
-// @access   Public 
-
+// @access   Privet 
 exports.auth = async (req, res, next) =>{
-  res.json({message: "Auth user"});
+  res.json(req.user);
 }
 
 
+// @desc     Delete User
+// @route    Delete /user/delete/:id
+// @access   Privet ! (Admin) 
+exports.delete = async (req, res, next) => {
+  User.findOneAndDelete({ _id: req.params.id })
+    .then(user => {
+      !user ? res.status(404).json({ message: 'User not found' })
+        : res.json({ message: 'User deleted successfully' });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ message: 'Error deleting user' });
+    });
+}
+
+// @desc     Update User from admin
+// @route    PUT /user/update/:id
+// @access   Privet ! (Admin) 
+exports.update = async (req, res, next) => {
+  const {firstName, lastName, email, phone, role } = req.body;
+  try {
+    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
+    if (!user) return res.status(404).json({message: 'User not found'});
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Internal Server Error'});
+  }
+}
+
+// @desc     Get a single user
+// @route    GET /user/profile/:id
+// @access   Public
+exports.profile = async (req, res, next) =>{
+  try{
+    const user = await User.findById(req.params.id).select('-password');
+    res.json({user});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+}
+
+// @desc     Update user password
+// @route    POST /user/update/password
+// @access   Privet (User)
+exports.password = async (req, res, next) =>{
+  const { old_password, password1, password2} = req.body;
+  const user = await User.findById(req.user.id).select('password');
+
+  // Check is all password is filled
+  if(!old_password || !password1 || !password2){
+    return res.status(400).json({message: 'All fields are required'});
+  }
+
+  // Verify the old password
+  if(!(await bcrypt.compare(old_password, user.password))){
+    return res.status(400).json({message: 'The old password is incorrect'});
+  }
+
+  // Verify if the passwords is match
+  if(password1 === password2){
+    try {
+      // update user password
+      await User.findOneAndUpdate({ _id: req.user.id }, { password: bcrypt.hashSync(password1, 10) })
+      // return success message
+      res.json({ message: "Password updated successfully." })
+    } catch (error) {
+      console.log(error);
+      res.status()
+    }
+  }else{
+    res.status(400).json({message: "The password is not match"})
+  }
+} 
+
+
+
+
+
+
+// @desc     Update User avatar
+// @route    PUT /user/avatar
+// @access   Privet (User) 
+exports.avatar = async (req, res) => {
+  try{
+    const old_avatar = await User.findById(req.user.id).select('avatar');
+    if (req.file.fieldname === 'avatar') {
+      // Get old avatar
+  
+      // Update user avatar
+      const user = await User.findOneAndUpdate({ _id: req.user.id }, { avatar: `/media/${req.file.filename}` }).select('-password');
+  
+      // Delete old vatar form storage
+      if (!old_avatar.avatar.startsWith('/media/avatar.png')) {
+        fs.unlink(__app + "/public" + old_avatar.avatar, (err) => {
+          return res.json(user);
+        });
+      }else{
+        return res.json(user);
+      }
+      
+    }
+  }catch(error){
+    console.log(error);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+
+}
+
+
+// @desc     Update user prfile
+// @route    PUT /user/update/prfile/:id
+// @access   Privet (User)
+exports.update = async (req, res, next) => {
+  const {firstName, lastName, email, phone } = req.body;
+  try {
+    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
+    if (!user) return res.status(404).json({message: 'User not found'});
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Internal Server Error'});
+  }
+}
