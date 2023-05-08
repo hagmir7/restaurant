@@ -6,17 +6,6 @@ const { upload } = require('../middleware/upload');
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 router.post('/login', UserController.login);
 router.post('/register', UserController.register);
 router.get('/list', UserController.list);

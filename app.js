@@ -33,6 +33,8 @@ app.use('/api', require('./routes/index'));
 app.use('/user', require('./routes/userRoute'));
 app.use('/role', require('./routes/roleRoute'));
 app.use('/category', require('./routes/categoryRoute'));
+app.use('/product', require('./routes/productRoute'));
+
 
 // Body parser
 app.use(bodyParser.json());
