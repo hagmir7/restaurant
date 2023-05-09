@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const User = require('../models/User');
+const { json } = require('body-parser');
 
 // Use .env
 require('dotenv').config({ path: './.env' });

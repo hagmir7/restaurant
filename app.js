@@ -33,6 +33,7 @@ app.use('/api', require('./routes/index'));
 app.use('/user', require('./routes/userRoute'));
 app.use('/role', require('./routes/roleRoute'));
 app.use('/category', require('./routes/categoryRoute'));
+app.use('/reservation', require('./routes/reservationRoute'));
 app.use('/product', require('./routes/productRoute'));
 
 
@@ -59,7 +60,7 @@ app.use(function(err, req, res, next) {
 
 
 // MongoDB Connection
-mongoose.connect(process.env.DB_URI, {
+mongoose.connect(process.env.DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
