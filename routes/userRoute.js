@@ -17,6 +17,6 @@ router.put('/password/update', protect, UserController.password);
 router.post('/avatar', protect, upload.single('avatar'), UserController.avatar);
 
 
-module.exports = router
+module.exports = router;
 
 
