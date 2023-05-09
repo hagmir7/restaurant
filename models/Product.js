@@ -14,7 +14,7 @@ const PorductSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'name Field is required'],
     },
-    Oldprice: {
+    oldPrice: {
         type: Number,
         required: [true, 'name Field is required'],
     },
