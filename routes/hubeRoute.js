@@ -8,7 +8,6 @@ const HubeController = require("../controllers/HubeController");
 
 router.post("/create", protect, HubeController.create);
 router.put("/update/:id", protect, HubeController.update);
-router.get("/list/admin", protectAdmin, HubeController.listAdmin);
 router.get("/list", HubeController.list);
 router.delete("/delete/:id", protect, HubeController.delete);
 router.get("/search", protect, HubeController.search);
