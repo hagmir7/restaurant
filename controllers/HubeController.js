@@ -2,7 +2,7 @@ const Hub = require("../models/Hube");
 const { paginate } = require("../utils");
 
 // Create a new hub
-const createHub = async (req, res) => {
+exports.create = async (req, res) => {
   const { phone, address, location, images, users, email, status } = req.body;
   try {
     const hub = new Hub({
@@ -16,14 +16,14 @@ const createHub = async (req, res) => {
       status: status,
     });
     await hub.save();
-    res.status(201).json({ success: true, hub });
+    res.status(201).json({ hub });
   } catch (error) {
-    res.status(400).json({ success: false, error: "Please set all fields" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // Update a hub
-const updateHub = async (req, res) => {
+exports.update = async (req, res) => {
   try {
     const hub = await Hub.findById(req.params.id);
     if (!hub) {
@@ -33,12 +33,12 @@ const updateHub = async (req, res) => {
     await hub.save();
     res.status(200).json({ success: true, hub });
   } catch (error) {
-    res.status(400).json({ success: false, error: "Please set all fields" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-// List hubs for admin with pagination limit 20
-const listHubsForAdmin = async (req, res) => {
+// List hubs for user with pagination limit 10
+exports.list = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -47,27 +47,12 @@ const listHubsForAdmin = async (req, res) => {
     const paginatedHubs = paginate(hubs, limit, page);
     res.status(200).json(paginatedHubs);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
-  }
-};
-
-// List hubs for user with pagination limit 10
-const listHubsForUser = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-
-    const hubs = await Hub.find({ chief: req.user.id });
-    const paginatedHubs = paginate(hubs, limit, page);
-    res.status(200).json(paginatedHubs);
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // Delete a hub
-const deleteHub = async (req, res) => {
+exports.delete = async (req, res) => {
   try {
     const hub = await Hub.findById(req.params.id);
     if (!hub) {
@@ -78,12 +63,12 @@ const deleteHub = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Hub deleted successfully" });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // Search for hubs
-const searchHubs = async (req, res) => {
+exports.search = async (req, res) => {
   const { query } = req.query;
   try {
     const page = parseInt(req.query.page) || 1;
@@ -92,15 +77,6 @@ const searchHubs = async (req, res) => {
     const paginatedHubs = paginate(hubs, limit, page);
     res.status(200).json({ success: true, paginatedHubs });
   } catch (error) {
-    res.status(400).json({ success: false, error: "Not Found" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
-};
-
-module.exports = {
-  createHub,
-  updateHub,
-  listHubsForAdmin,
-  listHubsForUser,
-  deleteHub,
-  searchHubs,
 };
