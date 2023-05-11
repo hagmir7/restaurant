@@ -6,17 +6,6 @@ const { upload } = require('../middleware/upload');
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 router.post('/login', UserController.login);
 router.post('/register', UserController.register);
 router.get('/list', UserController.list);
@@ -28,6 +17,6 @@ router.put('/password/update', protect, UserController.password);
 router.post('/avatar', protect, upload.single('avatar'), UserController.avatar);
 
 
-module.exports = router
+module.exports = router;
 
 

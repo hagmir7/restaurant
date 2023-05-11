@@ -23,13 +23,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+
 app.use("/api", require("./routes/index"));
 app.use("/user", require("./routes/userRoute"));
 app.use("/role", require("./routes/roleRoute"));
 app.use("/category", require("./routes/categoryRoute"));
-// for hube
 app.use("/hubs", require("./routes/hubeRoute"));
+
 
 // Body parser
 app.use(bodyParser.json());
@@ -52,6 +52,7 @@ app.use(function (err, req, res, next) {
 });
 
 // MongoDB Connection
+
 mongoose
   .connect(process.env.DB_URI, {
     useNewUrlParser: true,
@@ -59,6 +60,8 @@ mongoose
   })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB", err));
+
+
 
 // Start the server
 app.listen(port, () =>

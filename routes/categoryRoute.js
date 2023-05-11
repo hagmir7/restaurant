@@ -9,7 +9,8 @@ const { upload } = require('../middleware/upload')
 router.post('/create', protectAdmin, upload.single('image'), CategoryController.create);
 router.put('/update/:id', protectAdmin, upload.single('image'), CategoryController.update);
 router.delete('/delete/:id', protectAdmin, CategoryController.delete);
-router.get('/list',protectAdmin, CategoryController.list);
+router.get('/list', CategoryController.list);
+router.get('/products/:id', CategoryController.products);
 
 
 
