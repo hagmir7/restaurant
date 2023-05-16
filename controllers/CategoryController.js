@@ -1,6 +1,7 @@
 const Category = require('../models/Category');
 const { paginate } = require('../utils');
 const fs = require('fs');
+const Product = require('../models/Product');
 
 const path = require('path');
 // Project director path
@@ -77,5 +78,18 @@ exports.delete = async (req, res, next) => {
     }catch(error){
         console.log(error);
         res.status(5000).json({messsage: "Interval Server Error"});
+    }
+}
+
+
+exports.products = async (req, res, next) => {
+    const currentPage = req.query.page || 1;
+    const limit = req.query.limit || 15;
+    try {
+        const products = await Product.find({ category: req.params.id });
+        res.json(paginate(products, limit, currentPage));
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Interval Server Error" });
     }
 }
