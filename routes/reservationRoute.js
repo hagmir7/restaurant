@@ -13,6 +13,8 @@ router.get('/list',protect, ReservationController.list);
 router.get('/canceled',protectAdmin, ReservationController.canceled);
 router.get('/confirmed',protectAdmin, ReservationController.confirmed);
 router.get('/pending',protectAdmin, ReservationController.pending);
+router.post('/confirme/:id',protectAdmin, ReservationController.confirmeReservation);
+router.post('/cancele/:id',protectAdmin, ReservationController.canceleReservation);
 
 
 
