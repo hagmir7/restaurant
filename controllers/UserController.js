@@ -41,7 +41,7 @@ exports.login = async (req, res, next) =>{
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({ message: 'Email is not exists!' });
+      return res.status(400).json({ message: 'There is no user registered with this email!' });
     }
 
     const userPassword = await bcrypt.compare(password, user.password);
@@ -63,15 +63,15 @@ exports.login = async (req, res, next) =>{
 exports.register = async (req, res, next) =>{
   const { firstName, lastName, email, password } = req.body;
   // check if all fields is filled
+  console.log(firstName, lastName, email, password)
   if(!firstName || !lastName || !email || !password){
-    res.status(400);
-    throw new Error('Please add all fields');
+    return res.status(500).json({message: "Please add all fields"});
   }
 
   // Check if user is already exists
   const isExist = await User.findOne({ email });
   if (isExist) {
-    return res.json({ message: "User Already exists!", type: 'danger' });
+    return res.status(400).json({ message: "User email already exists!", type: 'danger' });
   }
 
   try {
@@ -123,7 +123,7 @@ exports.delete = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   const {firstName, lastName, email, phone, role } = req.body;
   try {
-    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
+    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role}, { new: true }).select('-password');
     if (!user) return res.status(404).json({message: 'User not found'});
     res.json(user);
   } catch (error) {
@@ -217,7 +217,7 @@ exports.avatar = async (req, res) => {
 // @route    PUT /user/update/prfile/:id
 // @access   Privet (User)
 exports.update = async (req, res, next) => {
-  const {firstName, lastName, email, phone } = req.body;
+  const {firstName, lastName, email, phone, role } = req.body;
   try {
     const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
     if (!user) return res.status(404).json({message: 'User not found'});

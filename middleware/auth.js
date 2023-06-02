@@ -17,13 +17,13 @@ exports.protect = async (req, res, next)=>{
             next();
         }catch(error){
             console.log(error);
-            res.status(401);
-            throw new Error('Not authorized, no token');
+            res.status(401).json({message: 'Not authorized, no token'});
+
         }
     }
 
     if(!token){
-        res.status(401).json({message: 'Not authorized, no token' });
+        res.status(401).json({message: 'Not authorized, no token'});
     }
 
 }
@@ -36,9 +36,9 @@ exports.protectAdmin = async (req, res, next) => {
             token = authorization.split(' ')[1];
             const decode = jwt.decode(token, process.env.TOKEN_SECRET);
             const user = await User.findById(decode.id).select('-password');
-            const role = await Role.findById(user.role?.toString()).select('name');
-            // return res.json(role);
-            if (!role || !role.name === 'Admin') {
+            const role = await Role.findById(user.role).select('name');
+            return res.json(role);
+            if (!user.role) {
                 return res.status(401).json({ message: "You are Not Admin!" });
             }
             req.user = user;

@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const RoleSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: true
     }
-},{
+}, {
     timestamps: true
 });
 
