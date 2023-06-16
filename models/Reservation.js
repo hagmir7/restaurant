@@ -9,31 +9,31 @@ const ReservationSchema = new mongoose.Schema(
       default: null,
     },
     start: {
-        type:Date,
-        required:true
+      type: Date,
+      required: true
     },
     end: {
-        type:Date,
-        required:true
+      type: Date,
+      required: true
     },
-    numPersons:{
-        type:Number 
+    numPersons: {
+      type: Number
     },
-    status:{
-        type:Boolean,
-        required:true,
-        default:null
+    status: {
+      type: Boolean,
+      required: true,
+      default: null
     },
-    phone:{
-        type:String,
-        required:true,
+    phone: {
+      type: String,
+      required: true,
     },
-    hubId:{
-        type: mongoose.Schema.Types.ObjectId,
-        required: false,
-        ref: "hubs",
-        default: null,
-      },
+    hubId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: "hubs",
+      default: null,
+    },
 
   },
   {
@@ -41,5 +41,5 @@ const ReservationSchema = new mongoose.Schema(
   }
 );
 
-const ReservationModel = mongoose.model("Reservation", ReservationSchema);
+ReservationModel = mongoose.model("Reservation", ReservationSchema);
 module.exports = ReservationModel;

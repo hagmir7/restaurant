@@ -13,6 +13,18 @@ require('dotenv').config({ path: './.env' });
 const __app = path.resolve(path.join(__dirname, '..'));
 
 
+exports.user = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Interval server error." })
+  }
+
+}
+
+
 
 
 // @desc     List of users
@@ -23,7 +35,7 @@ exports.list = async (req, res) => {
         const currentPage = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
       
-        const users = await User.find();
+        const users = await User.find().populate('role');
         const paginatedUsers = paginate(users, limit, currentPage);
         res.json(paginatedUsers);
       }catch(error){
@@ -41,12 +53,12 @@ exports.login = async (req, res, next) =>{
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({ message: 'Email is not exists!' });
+      return res.status(400).json({ message: 'There is no user registered with this email!' });
     }
 
     const userPassword = await bcrypt.compare(password, user.password);
     if (!userPassword) {
-      return res.json({ message: 'Password is incorrect!', type: "danger" })
+      return res.status(401).json({ message: 'Password is incorrect!', type: "danger" })
     }
     // Generate token
     const token = jwt.sign({id: user._id}, process.env.TOKEN_SECRET,{ expiresIn: '20d'});
@@ -63,15 +75,15 @@ exports.login = async (req, res, next) =>{
 exports.register = async (req, res, next) =>{
   const { firstName, lastName, email, password } = req.body;
   // check if all fields is filled
+  console.log(firstName, lastName, email, password)
   if(!firstName || !lastName || !email || !password){
-    res.status(400);
-    throw new Error('Please add all fields');
+    return res.status(500).json({message: "Please add all fields"});
   }
 
   // Check if user is already exists
   const isExist = await User.findOne({ email });
   if (isExist) {
-    return res.json({ message: "User Already exists!", type: 'danger' });
+    return res.status(400).json({ message: "User email already exists!", type: 'danger' });
   }
 
   try {
@@ -97,7 +109,7 @@ exports.register = async (req, res, next) =>{
 // @desc     Get current auth user
 // @route    Post /user/auth
 // @access   Privet 
-exports.auth = async (req, res, next) =>{
+exports.auth = async (req, res) =>{
   res.json(req.user);
 }
 
@@ -123,7 +135,7 @@ exports.delete = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   const {firstName, lastName, email, phone, role } = req.body;
   try {
-    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
+    const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role}, { new: true }).select('-password');
     if (!user) return res.status(404).json({message: 'User not found'});
     res.json(user);
   } catch (error) {
@@ -217,7 +229,7 @@ exports.avatar = async (req, res) => {
 // @route    PUT /user/update/prfile/:id
 // @access   Privet (User)
 exports.update = async (req, res, next) => {
-  const {firstName, lastName, email, phone } = req.body;
+  const {firstName, lastName, email, phone, role } = req.body;
   try {
     const user = await User.findOneAndUpdate({ _id: req.params.id }, { firstName, lastName, email, phone, role }, { new: true }).select('-password');
     if (!user) return res.status(404).json({message: 'User not found'});
@@ -225,5 +237,40 @@ exports.update = async (req, res, next) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({message: 'Internal Server Error'});
+  }
+}
+
+
+
+exports.adminsList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Admin' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+exports.serversList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Server' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+
+exports.delivryList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Delivry Man' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }

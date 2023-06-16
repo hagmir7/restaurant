@@ -11,18 +11,24 @@ exports.create = async (req, res, next)=>{
     }
 
     // Check if Role is already exists
-    if(RoleModel.find({name})){
-        res.status(400).json({message: "Role is already exits"});
+    if((await RoleModel.findOne({name}))){
+        return res.status(400).json({message: "Role is already exits"});
     }
 
     try{
-        const role = new RoleModel({name});
-        const newRole = await role.save()
-        res.json(newRole);
+        const role = await RoleModel.create({name});
+        res.json(role);
     }catch(error){
         console.log("Error creating new Role ", error);
         res.status(500).json({message: "Interval server error."})
     }
 
+}
+
+
+
+exports.list = async (req, res) => {
+    const roles = await RoleModel.find();
+    res.json(roles);
 
 }

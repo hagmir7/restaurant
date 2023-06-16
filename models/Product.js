@@ -37,6 +37,7 @@ const PorductSchema = new mongoose.Schema({
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
         required: [true, 'name Field is required'],
     }
 

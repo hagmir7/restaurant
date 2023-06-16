@@ -24,7 +24,7 @@ exports.create = async (req, res, next) => {
             name: req.body.name,
             image: `/media/${req.file.filename}`
         })
-        res.json(category);
+        res.status(201).json(category);
     } catch (error) {
         console.log(error);
         return res.status(500).json({message: "Internal Server Error."})

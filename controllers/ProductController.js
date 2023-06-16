@@ -2,6 +2,18 @@ const Product = require('../models/Product');
 const { paginate } = require('../utils');
 
 
+
+
+exports.product = async (req, res) =>{
+    try{
+        const product = await Product.findById(req.params.id).populate('category');
+        res.json(product);
+    }catch(error){
+        res.status(500).json({'message': "Internal server error."})
+    }
+}
+
+
 exports.create = async (req, res) => {
     const { name, price, oldPrice, description, body, status, category } = req.body;
     const images = req.files.map(file => `/media/${file.filename}`);
@@ -26,6 +38,7 @@ exports.create = async (req, res) => {
         });
     }
 };
+
 
 
 exports.update = async (req, res, next) => {
@@ -60,7 +73,7 @@ exports.list = async (req, res, next)=>{
     try{
         const limit = req.query.limit || 10;
         const page = req.query.page || 1;
-        const products = await Product.find({});
+        const products = await Product.find({}).populate('category');
         res.json(paginate(products, limit, page))
     }catch(error){
         console.log(error);

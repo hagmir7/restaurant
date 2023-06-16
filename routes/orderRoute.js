@@ -6,8 +6,9 @@ const { protectAdmin } = require('../middleware/auth')
 
 
 router.post('/create', protectAdmin, OrderController.create);
-router.get('/getorder/:id', protectAdmin, OrderController.getOrder);
+
 router.post('/cancele/:id', protectAdmin, OrderController.canceleOrder);
+router.get('/:id', protectAdmin, OrderController.getOrder);
 
 
 module.exports = router;

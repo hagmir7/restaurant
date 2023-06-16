@@ -1,17 +1,30 @@
-const createError = require("http-errors");
-const express = require("express");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-const port = process.env.NODE_PORT || 3000;
+
+const port = process.env.NODE_PORT || 3001;
 
 // Use .env
 require("dotenv").config({ path: "./.env" });
 
 const app = express();
+
+
+
+// CORS Headers
+const corsOptions = {
+  origin: 'http://localhost:3000'
+};
+
+app.use(cors());
+
+
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -59,16 +72,6 @@ app.use(function (err, req, res, next) {
 });
 
 // MongoDB Connection
-
-mongoose
-  .connect(process.env.DB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Error connecting to MongoDB", err));
-
-
 mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

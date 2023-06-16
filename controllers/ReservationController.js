@@ -101,7 +101,7 @@ exports.update = async (req, res, next) => {
 };
 
 
-exports.confirmeReservation = async (req, res, next) => {
+exports.confirme = async (req, res, next) => {
 // try {
   const reservation = await Reservation.findOneAndUpdate(
     { _id: req.params.id },
@@ -120,7 +120,7 @@ exports.confirmeReservation = async (req, res, next) => {
 
 
 
-exports.canceleReservation = async (req, res, next) => {
+exports.cancele = async (req, res, next) => {
 try {
   const reservation = await Reservation.findOneAndUpdate(
     { _id: req.params.id },

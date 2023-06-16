@@ -3,13 +3,23 @@ const mongoose = require('mongoose');
 const OrderSchema = new mongoose.Schema({
     creator: {
         type: mongoose.Schema.Types.ObjectId,
-
     },
     deliveryPar: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, 'deliveryPar Field is required'],
         ref:'User',
         default:null,
+    },
+
+    server: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, 'deliveryPar Field is required'],
+        ref:'User',
+        default:null,
+    },
+    address: {
+        type: String,
+        required: false
     },
     costumer: {
         type: mongoose.Schema.Types.ObjectId,
