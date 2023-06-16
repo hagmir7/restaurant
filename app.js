@@ -11,9 +11,10 @@ const cors = require('cors');
 const port = process.env.NODE_PORT || 3001;
 
 // Use .env
-require('dotenv').config({ path: './.env' });
+require("dotenv").config({ path: "./.env" });
 
 const app = express();
+
 
 
 // CORS Headers
@@ -21,18 +22,21 @@ const corsOptions = {
   origin: 'http://localhost:3000'
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
+
 
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
+
+
 
 // Routes
 app.use('/api', require('./routes/index'));
@@ -41,6 +45,10 @@ app.use('/role', require('./routes/roleRoute'));
 app.use('/category', require('./routes/categoryRoute'));
 app.use('/reservation', require('./routes/reservationRoute'));
 app.use('/product', require('./routes/productRoute'));
+app.use('/order', require('./routes/orderRoute'));
+app.use('/order/item', require('./routes/orderItemRoute'));
+app.use("/hubs", require("./routes/hubeRoute"));
+
 
 
 // Body parser
@@ -48,22 +56,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.error = req.app.get("env") === "development" ? err : {};
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render("error");
 });
-
-
 
 // MongoDB Connection
 mongoose.connect(process.env.DB_URI, {
@@ -74,7 +80,10 @@ mongoose.connect(process.env.DB_URI, {
 .catch((err) => console.error('Error connecting to MongoDB', err));
 
 
+
 // Start the server
-app.listen(port, () => console.log(`Server started on http://localhost:${port}`));
+app.listen(port, () =>
+  console.log(`Server started on http://localhost:${port}`)
+);
 
 module.exports = app;

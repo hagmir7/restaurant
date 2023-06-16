@@ -13,6 +13,18 @@ require('dotenv').config({ path: './.env' });
 const __app = path.resolve(path.join(__dirname, '..'));
 
 
+exports.user = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Interval server error." })
+  }
+
+}
+
+
 
 
 // @desc     List of users
@@ -23,7 +35,7 @@ exports.list = async (req, res) => {
         const currentPage = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
       
-        const users = await User.find();
+        const users = await User.find().populate('role');
         const paginatedUsers = paginate(users, limit, currentPage);
         res.json(paginatedUsers);
       }catch(error){
@@ -46,7 +58,7 @@ exports.login = async (req, res, next) =>{
 
     const userPassword = await bcrypt.compare(password, user.password);
     if (!userPassword) {
-      return res.json({ message: 'Password is incorrect!', type: "danger" })
+      return res.status(401).json({ message: 'Password is incorrect!', type: "danger" })
     }
     // Generate token
     const token = jwt.sign({id: user._id}, process.env.TOKEN_SECRET,{ expiresIn: '20d'});
@@ -97,7 +109,7 @@ exports.register = async (req, res, next) =>{
 // @desc     Get current auth user
 // @route    Post /user/auth
 // @access   Privet 
-exports.auth = async (req, res, next) =>{
+exports.auth = async (req, res) =>{
   res.json(req.user);
 }
 
@@ -225,5 +237,40 @@ exports.update = async (req, res, next) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({message: 'Internal Server Error'});
+  }
+}
+
+
+
+exports.adminsList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Admin' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+exports.serversList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Server' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+
+exports.delivryList = async (req, res) => {
+  try {
+    const user = await User.find({ role: 'Delivry Man' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }

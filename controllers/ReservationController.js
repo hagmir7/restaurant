@@ -100,6 +100,42 @@ exports.update = async (req, res, next) => {
   }
 };
 
+
+exports.confirme = async (req, res, next) => {
+// try {
+  const reservation = await Reservation.findOneAndUpdate(
+    { _id: req.params.id },
+    {status:true},
+    {new: true}
+  );
+  if(!reservation){
+    console.log('reservation not found');
+  }
+  res.status(200).json({message:'reservation confirmed',reservation})
+// } catch (error) {
+//   console.log(error);
+//   res.status(500).json({ message: "Interval Server Error" });
+// }
+};
+
+
+
+exports.cancele = async (req, res, next) => {
+try {
+  const reservation = await Reservation.findOneAndUpdate(
+    { _id: req.params.id },
+    {status:false},
+    {new: true}
+  );
+  res.status(200).json({message:'reservation canseled',reservation})
+} catch (error) {
+  console.log(error);
+  res.status(500).json({ message: "Interval Server Error" });
+}
+};
+
+
+
 exports.delete = async (req, res, next) => {
   try {
     await Reservation.findOneAndDelete({ _id: req.params.id, });

@@ -23,5 +23,12 @@ exports.create = async (req, res, next)=>{
         res.status(500).json({message: "Interval server error."})
     }
 
+}
+
+
+
+exports.list = async (req, res) => {
+    const roles = await RoleModel.find();
+    res.json(roles);
 
 }
